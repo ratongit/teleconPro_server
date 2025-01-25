@@ -31,8 +31,7 @@ const client = new MongoClient(uri, {
 
 const SiteInfoDataBase = client.db('telecomPro').collection('siteInfoDataBase');
 const impactSites = client.db('telecomPro').collection('impactSites');
-
-
+const impactMPSite = client.db('telecomPro').collection('impactMPSite');
 
 async function run() {
     try {
@@ -65,9 +64,32 @@ async function run() {
         });
 
 
+
+        //  Post impact site code on database from input form .
+        app.post('/impactMPSitePost', async (req, res) => {
+            const newSite = req.body; // Data sent from frontend
+            try {
+                const result = await impactMPSite.insertOne(newSite);
+                res.send({ success: true, message: "Site added successfully!", result });
+            } catch (error) {
+                console.error("Error inserting site:", error);
+                res.status(500).send({ success: false, message: "Failed to add site" });
+            }
+        });
+
+
         //  Now Get impact site code by database from impactSites .
         app.get('/impactsite', async (req, res) => {
             const result = await impactSites.find()?.toArray();
+            res?.send(result)
+            // all Site info Lat-Long
+            // console.log(`Impact data list ${result}`);
+
+        })
+
+
+        app.get('/impactMPSite', async (req, res) => {
+            const result = await impactMPSite.find()?.toArray();
             res?.send(result)
             // all Site info Lat-Long
             // console.log(`Impact data list ${result}`);
@@ -85,12 +107,6 @@ async function run() {
 run().catch(console.dir);
 
 
-const sites = [
-    { siteDown: "MBBRL05", dcLow: "MBBRL05" },
-    { siteDown: "MBBRL22", dcLow: "MBBRL22" },
-    { siteDown: "MBBRL45", dcLow: "MBBRL45" },
-    { siteDown: "MBSML75", dcLow: "GPHGJRI045" }
-]
 
 
 app.get('/', (req, res) => {
@@ -100,9 +116,6 @@ app.get('/', (req, res) => {
 app.get('/allSites', (req, res) => {
     res.send(sites)
 })
-
-
-
 
 
 
